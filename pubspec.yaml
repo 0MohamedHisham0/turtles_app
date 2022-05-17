@@ -55,6 +55,8 @@ dependencies:
   cloud_firestore: ^3.1.15
   html: ^0.15.0
   http: ^0.13.4
+  flutterfire_ui: ^0.4.1
+  firebase_auth: ^3.3.18
 
 dev_dependencies:
   flutter_test:

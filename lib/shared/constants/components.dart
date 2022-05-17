@@ -1,9 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:turtles_app/modules/chat_screen/chat_screen.dart';
+import 'package:turtles_app/modules/chat/chat_screen.dart';
 import 'package:turtles_app/shared/constants/constants.dart';
 
+import '../../modules/chat/chat_screen.dart';
 import '../../styles/colors.dart';
 import '../cubit/cubit.dart';
 

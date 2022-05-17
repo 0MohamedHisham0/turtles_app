@@ -15,7 +15,7 @@ class TurtlesAppCubit extends Cubit<TurtlesAppStates> {
 
   int currentIndex = 0;
 
-  List<String> titles = ['البرية', 'البحرية'];
+  List<String> titles = ['السلاحف البرية', 'السلاحف البحرية'];
 
   List<Widget> pages = [
     const WildTurtlesScreen(),

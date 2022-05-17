@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:turtles_app/models/chat_model.dart';
-import 'package:turtles_app/modules/chat_screen/cubit/states.dart';
+import 'package:turtles_app/modules/chat/cubit/states.dart';
 import 'package:html/parser.dart' as parser;
 import 'package:http/http.dart' as http;
 

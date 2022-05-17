@@ -64,3 +64,5 @@ Color chooseToastColor(ToastStates state) {
 
   return color;
 }
+
+var currentUid;

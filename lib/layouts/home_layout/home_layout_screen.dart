@@ -24,6 +24,7 @@ class HomeLayoutScreen extends StatelessWidget {
                 ),
               ),
               title: Center(child: Text(cubit.titles[cubit.currentIndex])),
+
             ),
             bottomNavigationBar: BottomNavigationBar(
               items: <BottomNavigationBarItem>[

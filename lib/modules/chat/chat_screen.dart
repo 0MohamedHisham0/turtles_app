@@ -1,14 +1,14 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:turtles_app/modules/chat_screen/cubit/cubit.dart';
-import 'package:turtles_app/modules/chat_screen/cubit/states.dart';
 import 'package:turtles_app/styles/colors.dart';
 
 import '../../shared/constants/components.dart';
 import '../../shared/constants/constants.dart';
+import '../chat/cubit/cubit.dart';
+import '../chat/cubit/states.dart';
+
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({Key? key}) : super(key: key);
