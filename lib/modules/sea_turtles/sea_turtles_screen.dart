@@ -14,8 +14,8 @@ class SeaTurtlesScreen extends StatelessWidget {
       listener: (context, state) {},
       builder: (context, state) {
         var cubit = TurtlesAppCubit.get(context);
-
-        return turtleListScreen(context, cubit.seaImagesUrl);
+        cubit.getPosts();
+        return turtleListScreen(context, cubit.seaImagesUrl, cubit.postsSea);
       },
     );
   }

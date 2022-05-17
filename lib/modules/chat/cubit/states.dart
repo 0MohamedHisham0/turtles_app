@@ -12,5 +12,7 @@ class AnswerErrorState extends ChatStates {}
 
 class ChatIconVisibilityState extends ChatStates {}
 
+class GetChatSuccessState extends ChatStates {}
+
 
 

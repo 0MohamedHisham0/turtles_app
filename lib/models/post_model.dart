@@ -1,4 +1,3 @@
-import 'package:html/dom.dart';
 
 class PostModel {
   String? id;
@@ -21,21 +20,28 @@ class PostModel {
     answer = json['answer'];
     likes = json['likes'];
     unLikes = json['unLikes'];
-    comments = json['comments'];
     time = json['time'];
     postCreator = json['postCreator'];
     postCreatorId = json['postCreatorId'];
+
+    if (json['comments'] != null) {
+      comments = <Comment>[];
+      json['comments'].forEach((v) {
+        comments!.add(Comment.fromJson(v));
+      });
+    }
+
   }
 
   // toJson
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['question'] = question;
     data['answer'] = answer;
     data['likes'] = likes;
     data['unLikes'] = unLikes;
-    data['comments'] = comments;
+    data['comments'] = comments ?? [];
     data['time'] = time;
     data['postCreator'] = postCreator;
     data['postCreatorId'] = postCreatorId;
@@ -43,4 +49,36 @@ class PostModel {
     return data;
   }
 
+
+}
+class Comment {
+  String? id;
+  String? comment;
+  String? time;
+  String? commentCreator;
+  String? commentCreatorId;
+
+  Comment(this.id, this.comment, this.time, this.commentCreator,
+      this.commentCreatorId);
+
+  // fromJason
+  Comment.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    comment = json['comment'];
+    time = json['time'];
+    commentCreator = json['commentCreator'];
+    commentCreatorId = json['commentCreatorId'];
+  }
+
+  // toJson
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['comment'] = comment;
+    data['time'] = time;
+    data['commentCreator'] = commentCreator;
+    data['commentCreatorId'] = commentCreatorId;
+
+    return data;
+  }
 }

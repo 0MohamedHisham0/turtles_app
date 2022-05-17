@@ -9,7 +9,6 @@ import '../../shared/constants/constants.dart';
 import '../chat/cubit/cubit.dart';
 import '../chat/cubit/states.dart';
 
-
 class ChatScreen extends StatelessWidget {
   const ChatScreen({Key? key}) : super(key: key);
 
@@ -18,7 +17,9 @@ class ChatScreen extends StatelessWidget {
     var textController = TextEditingController();
     var controllerList = ScrollController();
     return BlocProvider(
-        create: (context) => ChatCubit(),
+        create: (context) =>
+        ChatCubit()
+          ..getUserChat(),
         child: BlocConsumer<ChatCubit, ChatStates>(
             listener: (context, state) {},
             builder: (context, state) {
@@ -43,48 +44,63 @@ class ChatScreen extends StatelessWidget {
                       Expanded(
                         child: ConditionalBuilder(
                           condition: cubit.chatList.isEmpty,
-                          builder: (context) => Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  child: Column(
-                                    children: [
-                                      if (currentTurtle == 'wild')
-                                        SvgPicture.asset(
-                                          'assets/images/back_ground_svg_wild_turtle.svg',
-                                          width: 40,
-                                        ),
-                                      if (currentTurtle == 'sea')
-                                        SvgPicture.asset(
-                                          'assets/images/water-solid.svg',
-                                          color: defaultColor,
-                                          width: 40,
-                                        ),
-                                    ],
-                                  ),
+                          builder: (context) =>
+                              Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      child: Column(
+                                        children: [
+                                          if (currentTurtle == 'wild')
+                                            SvgPicture.asset(
+                                              'assets/images/back_ground_svg_wild_turtle.svg',
+                                              width: 40,
+                                            ),
+                                          if (currentTurtle == 'sea')
+                                            SvgPicture.asset(
+                                              'assets/images/water-solid.svg',
+                                              color: defaultColor,
+                                              width: 40,
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                    Text(
+                                      'لا يوجد رسائل حتى الآن',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: defaultColor,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  'لا يوجد رسائل حتى الآن',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: defaultColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                              ),
                           fallback: (context) {
                             return ListView.separated(
                                 physics: const BouncingScrollPhysics(),
                                 shrinkWrap: true,
                                 controller: controllerList,
                                 itemBuilder: (context, index) {
-                                  return cubit.chatList[index].id == '1'
-                                      ? chatSentItem(
-                                          cubit.chatList[index].message)
-                                      : chatReceivedItem(
-                                          cubit.chatList[index].message);
+                                  return Column(
+                                    children: [
+                                      chatSentItem(
+                                          cubit.chatList[index].question
+                                              .toString(),
+                                          timestampToDate(cubit
+                                              .chatList[index].time
+                                              .toString())),
+                                      if (cubit.chatList[index].answer != '')
+                                        chatReceivedItem(
+                                            cubit.chatList[index].answer
+                                                .toString(),
+                                            timestampToDate(cubit
+                                                .chatList[index].time
+                                                .toString()),(){
+                                              cubit.saveQuestionAsPost(cubit.chatList[index]);
+                                        }),
+                                    ],
+                                  );
                                 },
                                 separatorBuilder: (context, index) {
                                   return const SizedBox(
@@ -124,7 +140,13 @@ class ChatScreen extends StatelessWidget {
                                   color: defaultColor,
                                 ),
                                 onPressed: () {
-                                  askQuestion();
+                                  if (textController.text != '') {
+                                    askQuestion();
+                                  } else {
+                                    showToast(
+                                        text: 'الرجاء ادخال السؤال اولا',
+                                        state: ToastStates.WARNING);
+                                  }
                                 },
                               ),
                             ],
@@ -138,7 +160,7 @@ class ChatScreen extends StatelessWidget {
             }));
   }
 
-  Widget chatSentItem(String text) {
+  Widget chatSentItem(String text, String time) {
     // chat item
     return Padding(
       padding: const EdgeInsets.only(top: 5.0, left: 50),
@@ -156,18 +178,28 @@ class ChatScreen extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(text,
-                textAlign: TextAlign.right,
-                style: const TextStyle(
-                  fontSize: 20,
-                )),
+            child: Column(
+              children: [
+                Text(text,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      fontSize: 20,
+                    )),
+                Text(time,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey,
+                    )),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget chatReceivedItem(String text) {
+  Widget chatReceivedItem(String text, String time, Function onTap) {
     // chat item
     return Padding(
       padding: const EdgeInsets.only(top: 5.0, right: 50),
@@ -183,22 +215,39 @@ class ChatScreen extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Text(text,
-                  textAlign: TextAlign.right,
-                  style: const TextStyle(
-                    letterSpacing: 0.5,
-                    wordSpacing: 0.5,
-                    height: 1.5,
-                    fontSize: 20,
-                  )),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Text(text,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          letterSpacing: 0.5,
+                          wordSpacing: 0.5,
+                          height: 1.5,
+                          fontSize: 20,
+                        )),
+                    Text(time,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[700],
+                        )),
+                  ],
+                ),
+              ),
               myDivider(),
               Row(
                 children: [
-
                   Expanded(
                     child: InkWell(
-                      borderRadius: const BorderRadius.only(bottomRight: Radius.circular(12)),
-                      onTap: () {},
+                      borderRadius: const BorderRadius.only(
+                          bottomRight: Radius.circular(12)),
+                      onTap: () {
+                        showToast(text: 'تم تقيم السؤال بنجاح',
+                            state: ToastStates.SUCCESS);
+                        onTap();
+                      },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -209,17 +258,19 @@ class ChatScreen extends StatelessWidget {
                               width: 7,
                             ),
                             const Text('مفيد',
-                                style:
-                                TextStyle(fontSize: 19, color: Colors.black)),
+                                style: TextStyle(
+                                    fontSize: 19, color: Colors.black)),
                           ],
                         ),
                       ),
                     ),
                   ),
-
                   Expanded(
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        showToast(text: 'تم تقيم السؤال بنجاح',
+                            state: ToastStates.SUCCESS);
+                      },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -230,8 +281,8 @@ class ChatScreen extends StatelessWidget {
                               width: 7,
                             ),
                             const Text('غير مفيد',
-                                style:
-                                TextStyle(fontSize: 19, color: Colors.black)),
+                                style: TextStyle(
+                                    fontSize: 19, color: Colors.black)),
                           ],
                         ),
                       ),

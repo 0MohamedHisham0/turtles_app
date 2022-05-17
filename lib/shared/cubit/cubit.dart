@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:turtles_app/models/post_model.dart';
 import 'package:turtles_app/shared/constants/constants.dart';
 import 'package:turtles_app/styles/colors.dart';
 
@@ -16,6 +17,8 @@ class TurtlesAppCubit extends Cubit<TurtlesAppStates> {
   int currentIndex = 0;
 
   List<String> titles = ['السلاحف البرية', 'السلاحف البحرية'];
+  List<PostModel> postsSea = [];
+  List<PostModel> postsWild = [];
 
   List<Widget> pages = [
     const WildTurtlesScreen(),
@@ -72,6 +75,30 @@ class TurtlesAppCubit extends Cubit<TurtlesAppStates> {
       });
     }).catchError((error) {
       emit(TurtlesAppGetTurtlesImagesErrorState());
+      print(error);
+    });
+  }
+
+  void getPosts(){
+    FirebaseFirestore.instance.collection('posts').doc('userPosts').collection(currentTurtle).get().then((value) {
+
+      if(currentTurtle == 'sea'){
+        postsSea = [];
+        value.docs.forEach((element) {
+          postsSea.add(PostModel.fromJson(element.data()));
+        });
+      }
+
+      if(currentTurtle == 'wild'){
+        postsWild = [];
+        value.docs.forEach((element) {
+          postsWild.add(PostModel.fromJson(element.data()));
+        });
+      }
+
+      emit(TurtlesAppGetPostsSuccessState());
+    }).catchError((error) {
+      emit(TurtlesAppGetPostsErrorState());
       print(error);
     });
   }

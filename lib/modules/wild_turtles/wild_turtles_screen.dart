@@ -13,7 +13,9 @@ class WildTurtlesScreen extends StatelessWidget {
       listener: (context, state) {},
       builder: (context, state) {
         var cubit = TurtlesAppCubit.get(context);
-        return turtleListScreen(context, cubit.wildImagesUrl);
+        cubit.getPosts();
+
+        return turtleListScreen(context, cubit.wildImagesUrl,cubit.postsWild);
       },
     );
   }

@@ -1,6 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
+import 'package:turtles_app/models/post_model.dart';
 import 'package:turtles_app/modules/chat/chat_screen.dart';
 import 'package:turtles_app/shared/constants/constants.dart';
 
@@ -14,7 +16,7 @@ Widget myDivider() => Container(
       color: Colors.grey,
     );
 
-Widget postItem(String question, String commentsNum) {
+Widget postItem(String question, String commentsNum, String answer,String time) {
   return InkWell(
     borderRadius: BorderRadius.circular(20),
     onTap: () {},
@@ -36,14 +38,37 @@ Widget postItem(String question, String commentsNum) {
                       width: 10,
                     ),
                     Expanded(
-                      child: Text(question,
-                          textAlign: TextAlign.start,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 19,
-                              color: Colors.black)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(question,
+                              textAlign: TextAlign.start,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                height: 1,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 19,
+                                  color: Colors.black)),
+
+                          Text(timestampToDate(time),
+                              textAlign: TextAlign.start,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black)),
+
+                          Text(answer,
+                              textAlign: TextAlign.start,
+                              maxLines: 8,
+                              overflow: TextOverflow.ellipsis,
+                              style:  TextStyle(
+                                height: 1.5,
+                                  fontSize: 17,
+                                  color: Colors.grey[600])),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -80,7 +105,7 @@ Widget postItem(String question, String commentsNum) {
                   InkWell(
                     onTap: () {},
                     child: Padding(
-                      padding: const EdgeInsets.all( 10.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Row(
                         children: [
                           SvgPicture.asset('assets/images/dislike.svg',
@@ -114,7 +139,7 @@ Widget postItem(String question, String commentsNum) {
                             const SizedBox(
                               width: 7,
                             ),
-                            Text(commentsNum + ' تعليق',
+                            Text(int.parse(commentsNum) > 99 ?  '99+ تعليق' : commentsNum + ' تعليق',
                                 style: const TextStyle(
                                     fontSize: 19, color: Colors.black)),
                           ],
@@ -136,7 +161,7 @@ Widget postItem(String question, String commentsNum) {
   );
 }
 
-Widget turtleListScreen(context, List<String> imagesUrl) {
+Widget turtleListScreen(context, List<String> imagesUrl,List<PostModel> list) {
   return Scaffold(
     body: SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -251,17 +276,28 @@ Widget turtleListScreen(context, List<String> imagesUrl) {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  return postItem("ماذا تاكل السلاحف ؟", '23');
+                  return postItem(list[index].question.toString(), list[index].comments!.length.toString() , list[index].answer.toString() , list[index].time.toString());
                 },
                 separatorBuilder: (context, index) {
                   return const SizedBox(
                     height: 10,
                   );
                 },
-                itemCount: 20)
+                itemCount: list.length)
           ],
         ),
       ),
     ),
   );
+}
+
+int timestamp = DateTime.now().millisecondsSinceEpoch;
+
+// time stamp to date
+String timestampToDate(String timestamp) {
+  var now = DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp));
+  var formatter = DateFormat();
+  String formatted = formatter.add_jms().format(now);
+
+  return formatted;
 }

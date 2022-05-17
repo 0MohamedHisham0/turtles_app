@@ -13,7 +13,7 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var nameCompleter = TextEditingController();
+    var nameControler = TextEditingController();
     var key = GlobalKey<FormState>();
     return SafeArea(
       child: Scaffold(
@@ -42,13 +42,12 @@ class LoginScreen extends StatelessWidget {
                   ),
                   TextFormField(
                     textAlign: TextAlign.center,
-
-                    controller: nameCompleter,
+                    controller: nameControler,
                     style: const TextStyle(fontSize: 20),
-
                     decoration: InputDecoration(
-                      label: const Center(child: Text('اسمك')),
-                        hintStyle: TextStyle(fontSize: 20) ,floatingLabelAlignment: FloatingLabelAlignment.center,
+                        label: const Center(child: Text('اسمك')),
+                        hintStyle: const TextStyle(fontSize: 20),
+                        floatingLabelAlignment: FloatingLabelAlignment.center,
                         border: const OutlineInputBorder(),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: defaultColor),
@@ -69,6 +68,7 @@ class LoginScreen extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: () {
                         if (key.currentState!.validate()) {
+                          userName = nameControler.text;
                           login().then((value) => {
                                 if (value != null)
                                   {
@@ -76,12 +76,15 @@ class LoginScreen extends StatelessWidget {
                                         .collection('users')
                                         .doc(value.user!.uid)
                                         .set({
-                                      'name': nameCompleter.text,
+                                      'name': nameControler.text,
                                       'id': value.user!.uid,
                                     }).then((response) => {
                                               CacheHelper.saveData(
-                                                      key: 'currentUid',
-                                                      value: value.user!.uid)
+                                                  key: 'currentUid',
+                                                  value: value.user!.uid),
+                                              CacheHelper.saveData(
+                                                      key: 'name',
+                                                      value: nameControler.text)
                                                   .then((value) => {
                                                         currentUid = value,
                                                         navigateAndFinish(
