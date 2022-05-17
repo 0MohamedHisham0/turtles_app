@@ -1,8 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:turtles_app/modules/chat_screen/chat_screen.dart';
+import 'package:turtles_app/shared/constants/constants.dart';
 
 import '../../styles/colors.dart';
+import '../cubit/cubit.dart';
 
 Widget myDivider() => Container(
       width: double.infinity,
@@ -10,36 +13,39 @@ Widget myDivider() => Container(
       color: Colors.grey,
     );
 
-Widget questionItem() {
+Widget postItem(String question, String commentsNum) {
   return InkWell(
     borderRadius: BorderRadius.circular(20),
     onTap: () {},
     child: Container(
         width: double.infinity,
         child: Padding(
-          padding: const EdgeInsets.only(top: 14.0, right: 12.0, left: 12.0),
+          padding: const EdgeInsets.only(top: 14.0),
           child: Column(
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.question_answer,
-                    color: defaultColor,
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Text(" ماذا تاكل السلاحف ؟",
-                        textAlign: TextAlign.start,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 19,
-                            color: Colors.black)),
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.question_answer,
+                      color: defaultColor,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: Text(question,
+                          textAlign: TextAlign.start,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 19,
+                              color: Colors.black)),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(
                 height: 10,
@@ -48,9 +54,11 @@ Widget questionItem() {
               Row(
                 children: [
                   InkWell(
+                    borderRadius: const BorderRadius.only(
+                        bottomRight: Radius.circular(20)),
                     onTap: () {},
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Row(
                         children: [
                           SvgPicture.asset('assets/images/like.svg',
@@ -71,7 +79,7 @@ Widget questionItem() {
                   InkWell(
                     onTap: () {},
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all( 10.0),
                       child: Row(
                         children: [
                           SvgPicture.asset('assets/images/dislike.svg',
@@ -89,21 +97,24 @@ Widget questionItem() {
                   const Spacer(),
                   Expanded(
                     child: InkWell(
+                      borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(20)),
                       onTap: () {},
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 8.0),
                         child: Row(
                           children: [
                             Icon(
                               Icons.comment,
                               color: defaultColor,
-                              size: 20,
+                              size: 19,
                             ),
                             const SizedBox(
                               width: 7,
                             ),
-                            const Text('التعليقات',
-                                style: TextStyle(
+                            Text(commentsNum + ' تعليق',
+                                style: const TextStyle(
                                     fontSize: 19, color: Colors.black)),
                           ],
                         ),
@@ -124,14 +135,15 @@ Widget questionItem() {
   );
 }
 
-Widget turtleListScreen() {
+Widget turtleListScreen(context, List<String> imagesUrl) {
   return Scaffold(
     body: SingleChildScrollView(
-      child: Expanded(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: <Widget>[
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            if (imagesUrl.isNotEmpty)
               CarouselSlider(
                 options: CarouselOptions(
                   height: 200.0,
@@ -140,13 +152,7 @@ Widget turtleListScreen() {
                   autoPlayCurve: Curves.fastOutSlowIn,
                   aspectRatio: 16 / 9,
                 ),
-                items: [
-                  'https://i.pinimg.com/564x/57/91/63/579163f64da6acbbc762bcdd6e28d97a.jpg',
-                  'https://i.pinimg.com/564x/c2/63/e8/c263e8772c267c8d215a75c0cd3eb4ad.jpg',
-                  'https://i.pinimg.com/564x/2c/0e/00/2c0e0095fdc8bcd991f297448340213a.jpg',
-                  'https://i.pinimg.com/564x/78/cc/49/78cc49e40b7192b893979cba4d8df5e5.jpg',
-                  'https://i.pinimg.com/564x/4e/74/75/4e7475b8f32fd2ee9925e8230e94d4e0.jpg'
-                ].map((i) {
+                items: imagesUrl.map((i) {
                   return Builder(
                     builder: (BuildContext context) {
                       return Padding(
@@ -157,15 +163,15 @@ Widget turtleListScreen() {
                           children: [
                             Container(
                                 width: double.infinity,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.green,
+                                      color: defaultColor,
                                       blurRadius: 2.0,
                                       spreadRadius: 0.0,
                                     )
                                   ],
-                                  borderRadius: BorderRadius.all(
+                                  borderRadius: const BorderRadius.all(
                                     Radius.circular(20),
                                   ),
                                   color: Colors.red,
@@ -210,45 +216,49 @@ Widget turtleListScreen() {
                   );
                 }).toList(),
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () {},
-                child: Container(
-                    width: double.infinity,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 8),
-                      child: Text("ما هو سؤالك  ؟",
-                          textAlign: TextAlign.right,
-                          style: TextStyle(fontSize: 19, color: Colors.white)),
+            const SizedBox(
+              height: 10,
+            ),
+            InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                navigateTo(context, const ChatScreen());
+              },
+              child: Container(
+                  width: double.infinity,
+                  child: const Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                    child: Text("ما هو سؤالك  ؟",
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                            fontSize: 19,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold)),
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: defaultColor, width: 2),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(20),
                     ),
-                    decoration: BoxDecoration(
-                      color: defaultColor,
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(20),
-                      ),
-                    )),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return questionItem();
-                  },
-                  separatorBuilder: (context, index) {
-                    return const SizedBox(
-                      height: 10,
-                    );
-                  },
-                  itemCount: 20)
-            ],
-          ),
+                  )),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return postItem("ماذا تاكل السلاحف ؟", '23');
+                },
+                separatorBuilder: (context, index) {
+                  return const SizedBox(
+                    height: 10,
+                  );
+                },
+                itemCount: 20)
+          ],
         ),
       ),
     ),

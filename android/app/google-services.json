@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "137980338846",
+    "project_id": "turtlesapp-bcd22",
+    "storage_bucket": "turtlesapp-bcd22.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:137980338846:android:5f1e22a93ed5fac184518f",
+        "android_client_info": {
+          "package_name": "com.m.h.turtles_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "137980338846-0kn31l82as4sf6cpiini2jj5n6o0e8bo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.m.h.turtles_app",
+            "certificate_hash": "559acf779ff6574733174e039558777401e12b2b"
+          }
+        },
+        {
+          "client_id": "137980338846-q85qnpo4lmkr46tjcvg0cvc6lktu6qpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZi2xmOdle_vo-ZX-sT0mSoErRjMhKVKk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "137980338846-q85qnpo4lmkr46tjcvg0cvc6lktu6qpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
