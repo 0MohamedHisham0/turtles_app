@@ -2,6 +2,7 @@ import 'package:conditional_builder_null_safety/conditional_builder_null_safety.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:turtles_app/styles/colors.dart';
 
 import '../../shared/constants/components.dart';
@@ -17,9 +18,7 @@ class ChatScreen extends StatelessWidget {
     var textController = TextEditingController();
     var controllerList = ScrollController();
     return BlocProvider(
-        create: (context) =>
-        ChatCubit()
-          ..getUserChat(),
+        create: (context) => ChatCubit()..getUserChat()..loadAndListenToAd(),
         child: BlocConsumer<ChatCubit, ChatStates>(
             listener: (context, state) {},
             builder: (context, state) {
@@ -29,23 +28,20 @@ class ChatScreen extends StatelessWidget {
                 textController.clear();
               }
 
-              const SizedBox(
-                height: 40,
-              );
-
-              return Scaffold(
-                appBar: AppBar(
-                  title: const Text('المحادثة'),
-                ),
-                body: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: ConditionalBuilder(
-                          condition: cubit.chatList.isEmpty,
-                          builder: (context) =>
-                              Center(
+              return Builder(
+                builder: (context){
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: const Text('المحادثة'),
+                    ),
+                    body: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: ConditionalBuilder(
+                              condition: cubit.chatList.isEmpty,
+                              builder: (context) => Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -76,86 +72,108 @@ class ChatScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                          fallback: (context) {
-                            return ListView.separated(
-                                physics: const BouncingScrollPhysics(),
-                                shrinkWrap: true,
-                                controller: controllerList,
-                                itemBuilder: (context, index) {
-                                  return Column(
-                                    children: [
-                                      chatSentItem(
-                                          cubit.chatList[index].question
-                                              .toString(),
-                                          timestampToDate(cubit
-                                              .chatList[index].time
-                                              .toString())),
-                                      if (cubit.chatList[index].answer != '')
-                                        chatReceivedItem(
-                                            cubit.chatList[index].answer
-                                                .toString(),
-                                            timestampToDate(cubit
-                                                .chatList[index].time
-                                                .toString()),(){
-                                              cubit.saveQuestionAsPost(cubit.chatList[index]);
-                                        }),
-                                    ],
-                                  );
-                                },
-                                separatorBuilder: (context, index) {
-                                  return const SizedBox(
-                                    height: 8,
-                                  );
-                                },
-                                itemCount: cubit.chatList.length);
-                          },
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: SizedBox(
-                          height: 50,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.send,
-                                  autofocus: true,
-                                  controller: textController,
-                                  onSubmitted: (s) => askQuestion(),
-                                  decoration: const InputDecoration(
-                                      hintText: 'اكتب سؤالك هنا',
-                                      border: OutlineInputBorder(),
-                                      focusedBorder: OutlineInputBorder()),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.send,
-                                  color: defaultColor,
-                                ),
-                                onPressed: () {
-                                  if (textController.text != '') {
-                                    askQuestion();
-                                  } else {
-                                    showToast(
-                                        text: 'الرجاء ادخال السؤال اولا',
-                                        state: ToastStates.WARNING);
-                                  }
-                                },
-                              ),
-                            ],
+                              fallback: (context) {
+                                return ListView.separated(
+                                    physics: const BouncingScrollPhysics(),
+                                    shrinkWrap: true,
+                                    controller: controllerList,
+                                    itemBuilder: (context, index) {
+                                      return Column(
+                                        children: [
+                                          chatSentItem(
+                                              cubit.chatList[index].question
+                                                  .toString(),
+                                              timestampToDate(cubit
+                                                  .chatList[index].time
+                                                  .toString())),
+                                          if (cubit.chatList[index].answer != '')
+                                            chatReceivedItem(
+                                                cubit.chatList[index].answer
+                                                    .toString(),
+                                                timestampToDate(cubit
+                                                    .chatList[index].time
+                                                    .toString()), () {
+                                              cubit.saveQuestionAsPost(
+                                                  cubit.chatList[index]);
+                                            }),
+                                        ],
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) {
+                                      return const SizedBox(
+                                        height: 8,
+                                      );
+                                    },
+                                    itemCount: cubit.chatList.length);
+                              },
+                            ),
                           ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: SizedBox(
+                              height: 50,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      keyboardType: TextInputType.text,
+                                      textInputAction: TextInputAction.send,
+                                      autofocus: true,
+                                      controller: textController,
+                                      onSubmitted: (value) {
+                                        askQuestion();
+                                      },
+                                      decoration: const InputDecoration(
+                                          hintText: 'اكتب سؤالك هنا',
+                                          border: OutlineInputBorder(),
+                                          focusedBorder: OutlineInputBorder()),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.send,
+                                      color: defaultColor,
+                                    ),
+                                    onPressed: () {
+                                      if (textController.text != '') {
+                                        if (textController.text.contains('سلاحف') ||
+                                            textController.text
+                                                .contains('السلاحف')) {
+                                          askQuestion();
+                                        } else {
+                                          showToast(
+                                              text:
+                                              'يجب ان يحتوي السؤال علي كلمة (السلاحف او سلاحف)',
+                                              state: ToastStates.WARNING);
+                                        }
+                                      } else {
+                                        showToast(
+                                            text: 'الرجاء ادخال السؤال اولا',
+                                            state: ToastStates.WARNING);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Container(
+                              alignment: Alignment.center,
+                              width: cubit.myBanner.size.width.toDouble(),
+                              height: cubit.myBanner.size.height.toDouble(),
+                              child: AdWidget(ad: cubit.myBanner))
+                        ],
+                      ),
+                    ),
+                  );
+                },
               );
             }));
   }
@@ -244,7 +262,8 @@ class ChatScreen extends StatelessWidget {
                       borderRadius: const BorderRadius.only(
                           bottomRight: Radius.circular(12)),
                       onTap: () {
-                        showToast(text: 'تم تقيم السؤال بنجاح',
+                        showToast(
+                            text: 'تم تقيم السؤال بنجاح',
                             state: ToastStates.SUCCESS);
                         onTap();
                       },
@@ -268,7 +287,8 @@ class ChatScreen extends StatelessWidget {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        showToast(text: 'تم تقيم السؤال بنجاح',
+                        showToast(
+                            text: 'تم تقيم السؤال بنجاح',
                             state: ToastStates.SUCCESS);
                       },
                       child: Padding(

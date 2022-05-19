@@ -68,3 +68,4 @@ Color chooseToastColor(ToastStates state) {
 
 var currentUid;
 var userName;
+var adUnitBanner = 'ca-app-pub-5465142616619029/3222847644';

@@ -14,5 +14,7 @@ class ChatIconVisibilityState extends ChatStates {}
 
 class GetChatSuccessState extends ChatStates {}
 
+class AdLoadedSuccessState extends ChatStates {}
+
 
 

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:turtles_app/shared/constants/constants.dart';
 import 'package:turtles_app/shared/cubit/cubit.dart';
@@ -9,12 +10,22 @@ import 'package:turtles_app/shared/network/local/CachHelper.dart';
 import 'package:turtles_app/styles/colors.dart';
 import 'layouts/home_layout/home_layout_screen.dart';
 import 'modules/login/login_screen.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  String version;
+  List<String> testDeviceIds = ['55E8BFD920137E91DE25B9523135D5F9'];
+
+  // thing to add
+  RequestConfiguration configuration =
+      RequestConfiguration(testDeviceIds: testDeviceIds);
+  MobileAds.instance.updateRequestConfiguration(configuration);
+
   await Firebase.initializeApp();
   await CacheHelper.init();
+  MobileAds.instance.initialize();
 
   Widget? widget;
   currentUid = CacheHelper.getData(key: 'currentUid');
@@ -25,9 +36,9 @@ Future<void> main() async {
     widget = const HomeLayoutScreen();
   }
 
-    runApp(
-      MyApp(widget: widget),
-    );
+  runApp(
+    MyApp(widget: widget),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -39,8 +50,10 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
         providers: [
           BlocProvider(
-              create: (context) =>
-              TurtlesAppCubit()
+              create: (context) => TurtlesAppCubit()
+                ..getSeaPosts()
+                ..getWildPosts()
+                ..loadAndListenToAd()
                 ..getSeaTurtlesImages()
                 ..getWildTurtlesImages()),
         ],

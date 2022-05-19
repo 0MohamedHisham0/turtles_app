@@ -57,6 +57,7 @@ dependencies:
   http: ^0.13.4
   flutterfire_ui: ^0.4.1
   firebase_auth: ^3.3.18
+  google_mobile_ads: ^1.2.0
 
 dev_dependencies:
   flutter_test:

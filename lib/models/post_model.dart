@@ -6,12 +6,23 @@ class PostModel {
   int? likes;
   int? unLikes;
   List<Comment>? comments;
+  List<String>? raters;
   String? time;
   String? postCreator;
   String? postCreatorId;
 
-  PostModel(this.id, this.question, this.answer, this.likes, this.unLikes,
-      this.comments, this.time, this.postCreator, this.postCreatorId);
+  PostModel(
+    this.id,
+    this.question,
+    this.answer,
+    this.likes,
+    this.unLikes,
+    this.comments,
+    this.raters,
+    this.time,
+    this.postCreator,
+    this.postCreatorId,
+  );
 
   // fromJason
   PostModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +34,13 @@ class PostModel {
     time = json['time'];
     postCreator = json['postCreator'];
     postCreatorId = json['postCreatorId'];
+
+    if (json['raters'] != null) {
+      raters = <String>[];
+      json['raters'].forEach((v) {
+        raters!.add(v.toString());
+      });
+    }
 
     if (json['comments'] != null) {
       comments = <Comment>[];
@@ -42,13 +60,13 @@ class PostModel {
     data['likes'] = likes;
     data['unLikes'] = unLikes;
     data['comments'] = comments ?? [];
+    data['raters'] = raters ?? [];
     data['time'] = time;
     data['postCreator'] = postCreator;
     data['postCreatorId'] = postCreatorId;
 
     return data;
   }
-
 
 }
 class Comment {

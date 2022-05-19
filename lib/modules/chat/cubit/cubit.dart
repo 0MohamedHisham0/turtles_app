@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:turtles_app/models/message_model.dart';
 import 'package:turtles_app/models/post_model.dart';
 import 'package:turtles_app/models/question_model.dart';
@@ -15,6 +16,44 @@ class ChatCubit extends Cubit<ChatStates> {
   ChatCubit() : super(ChatInitialState());
 
   List<QuestionModel> chatList = [];
+
+  //Ad Mob Banner
+  BannerAdListener listener = const BannerAdListener();
+  late BannerAd myBanner;
+
+  void loadAndListenToAd() {
+
+    myBanner = BannerAd(
+      adUnitId: adUnitBanner,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: listener,
+    );
+
+    myBanner.load();
+
+    listener = BannerAdListener(
+      // Called when an ad is successfully received.
+      onAdLoaded: (Ad ad) => emit(AdLoadedSuccessState()),
+      // Called when an ad request failed.
+      onAdFailedToLoad: (Ad ad, LoadAdError error) {
+        // Dispose the ad here to free resources.
+        ad.dispose();
+        print('Ad failed to load: $error');
+      },
+      // Called when an ad opens an overlay that covers the screen.
+      onAdOpened: (Ad ad) => print('Ad opened.'),
+      // Called when an ad removes an overlay that covers the screen.
+      onAdClosed: (Ad ad) => myBanner.dispose(),
+      // Called when an impression occurs on the ad.
+      onAdImpression: (Ad ad) => myBanner.dispose(),
+
+
+    );
+
+
+
+  }
 
   void sendMessageAndAsk(String question, ScrollController controllerList) {
     var questionModel = QuestionModel(
@@ -34,24 +73,38 @@ class ChatCubit extends Cubit<ChatStates> {
 
     getSearchSmallResult(question)
         .then((value) => {
-              chatList.last.answer = value,
-              Future.delayed(const Duration(milliseconds: 50), () {
-                controllerList.animateTo(
-                    controllerList.position.maxScrollExtent,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.ease);
-              }),
-              emit(AnswerSuccessState()),
-              sendMessageToFB(questionModel)
+              if (value.contains('عرض النتائج عن'))
+                {
+                  print(removeSigns(value)),
+                  chatList.last.answer = " هل تقصد${removeSigns(value)}",
+                  Future.delayed(const Duration(milliseconds: 50), () {
+                    controllerList.animateTo(
+                        controllerList.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.ease);
+                  }),
+                  emit(AnswerSuccessState()),
+                }
+              else
+                {
+                  chatList.last.answer = value,
+                  Future.delayed(const Duration(milliseconds: 50), () {
+                    controllerList.animateTo(
+                        controllerList.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.ease);
+                  }),
+                  emit(AnswerSuccessState()),
+                  sendMessageToFB(questionModel)
+                }
             })
-        .catchError((error) => {
-              print(error),
-              emit(AnswerErrorState()),
-            });
+        .catchError((error) {
+      print(error);
+      emit(AnswerErrorState());
+    });
   }
 
   // delay function
-
   Future<String> getSearchSmallResult(String searchTest) async {
     final response = await http.Client()
         .get(Uri.parse('https://www.google.com/search?q=$searchTest'));
@@ -107,13 +160,16 @@ class ChatCubit extends Cubit<ChatStates> {
         .doc();
 
     List<Comment> list = [];
+    List<String> raters = [];
+
     var postModel = PostModel(
         newCityRef.id,
         questionModel.question,
         questionModel.answer,
-        1,
+        0,
         0,
         list,
+        raters,
         timestamp.toString(),
         userName,
         currentUid);
@@ -121,4 +177,26 @@ class ChatCubit extends Cubit<ChatStates> {
     newCityRef.set(postModel.toJson());
   }
 
+  // remove all signs and numbers from string
+  String removeSigns(String text) {
+    return text
+        .split('عرض النتائج عن')
+        .toString()
+        .replaceAll(RegExp(r'[\d]'), '')
+        .replaceAll('البحث', '')
+        .replaceAll('{', '')
+        .replaceAll('}', '')
+        .replaceAll('&', '')
+        .replaceAll('#', '')
+        .replaceAll(';', '')
+        .replaceAll('[', '')
+        .replaceAll(']', '')
+        .replaceAll('(', '')
+        .replaceAll(')', '')
+        .replaceAll('\'', '')
+        .replaceAll('"', '')
+        .replaceAll('.', '')
+        .replaceAll('=', '')
+        .replaceAll(',', '');
+  }
 }
