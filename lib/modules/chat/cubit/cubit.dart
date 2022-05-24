@@ -22,7 +22,6 @@ class ChatCubit extends Cubit<ChatStates> {
   late BannerAd myBanner;
 
   void loadAndListenToAd() {
-
     myBanner = BannerAd(
       adUnitId: adUnitBanner,
       size: AdSize.banner,
@@ -47,12 +46,7 @@ class ChatCubit extends Cubit<ChatStates> {
       onAdClosed: (Ad ad) => myBanner.dispose(),
       // Called when an impression occurs on the ad.
       onAdImpression: (Ad ad) => myBanner.dispose(),
-
-
     );
-
-
-
   }
 
   void sendMessageAndAsk(String question, ScrollController controllerList) {

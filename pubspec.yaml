@@ -55,13 +55,28 @@ dependencies:
   cloud_firestore: ^3.1.15
   html: ^0.15.0
   http: ^0.13.4
-  flutterfire_ui: ^0.4.1
+  flutterfire_ui: ^0.4.1+1
   firebase_auth: ^3.3.18
   google_mobile_ads: ^1.2.0
+
+
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+
+  flutter_launcher_icons: ^0.9.2
+  flutter_app_name: ^0.1.0
+
+flutter_app_name:
+  name: "TurtLes"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
